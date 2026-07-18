@@ -22,32 +22,6 @@ document.getElementById("quickSearchForm")?.addEventListener("submit", event => 
   document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
 });
 
-document.getElementById("leadForm")?.addEventListener("submit", event => {
-  event.preventDefault();
 
-  const firstName = document.getElementById("firstName").value.trim();
-  const lastName = document.getElementById("lastName").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const area = document.getElementById("preferredArea").value;
-  const budget = document.getElementById("preferredBudget").value;
-  const message = document.getElementById("message").value.trim();
-
-  const subject = `New buyer lead: ${firstName} ${lastName}`;
-  const body = [
-    "New buyer inquiry from the Elegant Homes website",
-    "",
-    `Name: ${firstName} ${lastName}`,
-    `Email: ${email}`,
-    `Phone: ${phone || "Not provided"}`,
-    `Preferred area: ${area}`,
-    `Price range: ${budget || "Not provided"}`,
-    "",
-    "Message:",
-    message || "No additional message"
-  ].join("\n");
-
-  window.location.href = `mailto:srshomes329@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-});
 
 document.getElementById("year").textContent = new Date().getFullYear();
