@@ -55,8 +55,11 @@ leadForm?.addEventListener('submit', async (event) => {
       formStatus.classList.add('success');
     }
 
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({event: 'generate_lead', form_name: 'Elegant Homes DFW Lead Form'});
+   if (typeof gtag === 'function') {
+  gtag('event', 'generate_lead', {
+    form_name: 'Elegant Homes DFW Lead Form'
+  });
+}
   } catch (error) {
     if (formStatus) {
       formStatus.textContent = 'The form could not be sent. Please call or text Binoy at (469) 866-2644.';
