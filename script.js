@@ -1,3 +1,4 @@
+
 const year = document.getElementById('year');
 if (year) year.textContent = new Date().getFullYear();
 
@@ -78,7 +79,7 @@ if (leadForm) {
       });
 
     } catch (error) {
-      console.error(error);
+      console.error('Form submission error:', error);
 
       if (formStatus) {
         formStatus.textContent =
