@@ -46,6 +46,15 @@
   </script>
 
   <style>
+    .form-trap {
+      position: absolute !important;
+      left: -10000px !important;
+      top: auto !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+    }
+
     @media (min-width: 901px) {
       .service-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -116,6 +125,12 @@
                 <option value="New Construction">New Construction</option>
               </select>
             </label>
+
+            <div class="form-trap" aria-hidden="true">
+              <label>Leave this field empty
+                <input type="text" name="_gotcha" id="website-check" tabindex="-1" autocomplete="off">
+              </label>
+            </div>
 
             <input type="hidden" name="lead_source" value="ElegantHomesDFW.com">
             <input type="hidden" name="page_url" id="page-url">
