@@ -26,12 +26,44 @@ document.querySelectorAll('[data-interest]').forEach((link) => {
 
 const leadForm = document.getElementById('lead-form');
 const formStatus = document.getElementById('form-status');
+const formLoadedAt = Date.now();
+
+function isReserved555Number(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  const tenDigits = digits.length === 11 && digits.startsWith('1') ? digits.slice(1) : digits;
+  return /^\d{3}55501\d{2}$/.test(tenDigits);
+}
 
 if (leadForm) {
   leadForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     if (!leadForm.reportValidity()) return;
+
+    const honeypot = leadForm.querySelector('input[name="_gotcha"]');
+    if (honeypot && honeypot.value.trim() !== '') {
+      return;
+    }
+
+    if (Date.now() - formLoadedAt < 3000) {
+      if (formStatus) {
+        formStatus.textContent = 'Please wait a moment and submit again.';
+        formStatus.classList.remove('success');
+        formStatus.classList.add('error');
+      }
+      return;
+    }
+
+    const phoneField = leadForm.querySelector('input[name="phone"]');
+    if (phoneField && isReserved555Number(phoneField.value)) {
+      if (formStatus) {
+        formStatus.textContent = 'Please enter a valid phone number.';
+        formStatus.classList.remove('success');
+        formStatus.classList.add('error');
+      }
+      phoneField.focus();
+      return;
+    }
 
     const submitButton = leadForm.querySelector('button[type="submit"]');
     const originalText = submitButton ? submitButton.textContent : 'Send My Home Request';
