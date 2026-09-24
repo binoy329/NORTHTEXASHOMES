@@ -27,6 +27,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css?v=10">
+  <style>
+    .form-trap { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+  </style>
 
   <script type="application/ld+json">
   {
@@ -145,6 +148,10 @@
 
             <label>Target Move-In Date<input name="move_in_date" type="date" required></label>
 
+            <div class="form-trap" aria-hidden="true">
+              <label>Leave this field empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>
+            </div>
+
             <input type="hidden" name="lead_source" value="ElegantHomesDFW.com Rentals">
             <input type="hidden" name="page_url" id="page-url">
             <input type="hidden" name="utm_source" id="utm-source">
@@ -154,6 +161,7 @@
 
             <button class="button button-gold button-full" type="submit">Send Me Rental Options</button>
             <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+            <small>You may be asked to complete a quick security check after submitting.</small>
             <small>By submitting, you agree that Binoy Thomas may contact you about your rental request. Your information is not sold. Housing availability, pricing and approval criteria are determined by the property owner or management company.</small>
           </form>
         </aside>
@@ -267,6 +275,6 @@
     <a href="sms:+14698662644">Text Binoy</a>
   </div>
 
-  <script src="rentals.js?v=1"></script>
+  <script src="rentals.js?v=2"></script>
 </body>
 </html>

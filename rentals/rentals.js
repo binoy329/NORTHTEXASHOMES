@@ -17,61 +17,48 @@ Object.entries(trackingFields).forEach(([id, value]) => {
 
 const rentalForm = document.getElementById('rental-lead-form');
 const formStatus = document.getElementById('form-status');
+const formLoadedAt = Date.now();
+
+function isReserved555Number(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  const tenDigits = digits.length === 11 && digits.startsWith('1') ? digits.slice(1) : digits;
+  return /^\d{3}55501\d{2}$/.test(tenDigits);
+}
 
 if (rentalForm) {
-  rentalForm.addEventListener('submit', async (event) => {
+  rentalForm.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!rentalForm.reportValidity()) return;
 
-    const submitButton = rentalForm.querySelector('button[type="submit"]');
-    const originalText = submitButton ? submitButton.textContent : 'Send Me Rental Options';
+    const honeypot = rentalForm.querySelector('input[name="_gotcha"]');
+    if (honeypot && honeypot.value.trim() !== '') return;
 
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = 'Sending...';
-    }
-
-    if (formStatus) {
-      formStatus.textContent = 'Sending your rental request...';
-      formStatus.classList.remove('success', 'error');
-    }
-
-    try {
-      const response = await fetch(rentalForm.action, {
-        method: 'POST',
-        body: new FormData(rentalForm),
-        headers: { 'Accept': 'application/json' }
-      });
-
-      if (!response.ok) throw new Error(`Formspree returned ${response.status}`);
-
+    if (Date.now() - formLoadedAt < 3000) {
       if (formStatus) {
-        formStatus.textContent = 'Thank you! Your rental request was sent successfully. Binoy will contact you soon.';
-        formStatus.classList.add('success');
-      }
-
-      if (typeof gtag === 'function') {
-        gtag('event', 'rental_lead', {
-          form_name: 'Elegant Homes DFW Rental Lead Form'
-        });
-      }
-
-      rentalForm.reset();
-      Object.entries(trackingFields).forEach(([id, value]) => {
-        const field = document.getElementById(id);
-        if (field) field.value = value;
-      });
-    } catch (error) {
-      console.error('Rental form submission error:', error);
-      if (formStatus) {
-        formStatus.textContent = 'Sorry, your request could not be sent. Please try again or call (469) 866-2644.';
+        formStatus.textContent = 'Please wait a moment and submit again.';
+        formStatus.classList.remove('success');
         formStatus.classList.add('error');
       }
-    } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = originalText;
-      }
+      return;
     }
+
+    const phoneField = rentalForm.querySelector('input[name="phone"]');
+    if (phoneField && isReserved555Number(phoneField.value)) {
+      if (formStatus) {
+        formStatus.textContent = 'Please enter a valid phone number.';
+        formStatus.classList.remove('success');
+        formStatus.classList.add('error');
+      }
+      phoneField.focus();
+      return;
+    }
+
+    // Formspree's hosted CAPTCHA requires a normal browser POST. A fetch request
+    // cannot complete its verification page, so submit only after local checks.
+    if (formStatus) {
+      formStatus.textContent = 'Continuing to secure verification...';
+      formStatus.classList.remove('success', 'error');
+    }
+    rentalForm.submit();
   });
 }
