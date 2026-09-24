@@ -26,7 +26,7 @@ function isReserved555Number(value) {
 }
 
 if (rentalForm) {
-  rentalForm.addEventListener('submit', (event) => {
+  rentalForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!rentalForm.reportValidity()) return;
 
@@ -53,12 +53,53 @@ if (rentalForm) {
       return;
     }
 
-    // Formspree's hosted CAPTCHA requires a normal browser POST. A fetch request
-    // cannot complete its verification page, so submit only after local checks.
+    const captcha = rentalForm.querySelector('[name="g-recaptcha-response"]');
+    if (!captcha || !captcha.value) {
+      if (formStatus) {
+        formStatus.textContent = 'Please complete the security check.';
+        formStatus.classList.remove('success');
+        formStatus.classList.add('error');
+      }
+      return;
+    }
+
+    const submitButton = rentalForm.querySelector('button[type="submit"]');
+    if (submitButton) submitButton.disabled = true;
     if (formStatus) {
-      formStatus.textContent = 'Continuing to secure verification...';
+      formStatus.textContent = 'Sending your rental request...';
       formStatus.classList.remove('success', 'error');
     }
-    rentalForm.submit();
+
+    try {
+      const response = await fetch(rentalForm.action, {
+        method: 'POST',
+        body: new FormData(rentalForm),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!response.ok) throw new Error(`Formspree returned ${response.status}`);
+
+      if (formStatus) {
+        formStatus.textContent = 'Thank you! Your rental request was sent successfully. Binoy will contact you soon.';
+        formStatus.classList.add('success');
+      }
+      if (typeof gtag === 'function') {
+        gtag('event', 'rental_lead', { form_name: 'Elegant Homes DFW Rental Lead Form' });
+      }
+      rentalForm.reset();
+      if (window.grecaptcha) window.grecaptcha.reset();
+      Object.entries(trackingFields).forEach(([id, value]) => {
+        const field = document.getElementById(id);
+        if (field) field.value = value;
+      });
+    } catch (error) {
+      console.error('Rental form submission error:', error);
+      if (formStatus) {
+        formStatus.textContent = 'Your request was not sent. Please complete the security check again or call (469) 866-2644.';
+        formStatus.classList.add('error');
+      }
+      if (window.grecaptcha) window.grecaptcha.reset();
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
   });
 }
